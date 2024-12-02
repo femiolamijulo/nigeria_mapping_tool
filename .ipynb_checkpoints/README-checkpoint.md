@@ -121,7 +121,7 @@ Due to browser security restrictions, it's recommended to serve the HTML file us
 
 ### Dynamic Search
 
-- **Search Box**:
+- **Search Box**: TBD
 
   - Type in the search box to find States, LGAs, or Wards.
   - The map dynamically updates to highlight matching areas as you type.
