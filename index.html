@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nigeria Interactive Map</title>
+    <title>Nigeria Map Tool</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
     <style>
         body, html {
             margin: 0;
@@ -287,8 +288,16 @@
     </style>
 </head>
 <body>
-    <div id="map"></div>
-    <div class="map-title">Nigeria Interactive Map</div>
+    <header>
+        <h1>Nigeria Map Tool</h1>
+    </header>
+    <main>
+        <div id="map"></div>
+        <div id="sidebar"></div>
+    </main>
+    <footer>
+        <p>&copy; 2023 Nigeria Map Tool</p>
+    </footer>
     
     <!-- Loading overlay -->
     <div class="loading-overlay" id="loading-overlay">
@@ -356,5 +365,7 @@
                 });
         });
     </script>
+    <script src="scripts/map.js"></script>
+    <script src="scripts/filters.js"></script>
 </body>
 </html>
