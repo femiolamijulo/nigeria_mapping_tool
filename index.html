@@ -340,7 +340,7 @@
             initializeSidebar();
             
             // Load your GeoJSON data here
-            fetch('path/to/nigeria_wards.geojson')
+            fetch('ward_geojson.geojson')
                 .then(response => response.json())
                 .then(data => {
                     window.wardGeoJSON = data;
