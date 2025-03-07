@@ -285,6 +285,30 @@
             font-family: 'Poppins', sans-serif;
             font-size: 14px;
         }
+
+        /* Floating Action Button (FAB) */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 2000;
+        }
+
+        .fab:hover {
+            background-color: #2980b9;
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
@@ -303,16 +327,23 @@
     <div class="loading-overlay" id="loading-overlay">
         <div class="spinner"></div>
     </div>
+
+    <!-- Floating Action Button -->
+    <div class="fab" id="fab-reset">
+        <i class="fas fa-redo"></i>
+    </div>
     
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script type="module">
         import { initializeSidebar } from './sidebar.js';
-        import { resetHighlighting, mergeGeometries, clearLayers } from './scripts.js';
+        import { resetHighlighting, mergeGeometries, clearLayers, updateMapForSearchResults } from './scripts.js';
         
         // Make these functions available globally
         window.resetHighlighting = resetHighlighting;
         window.mergeGeometries = mergeGeometries;
         window.clearLayers = clearLayers;
+        window.showNotification = showNotification;
+        window.updateMapForSearchResults = updateMapForSearchResults;
         
         // Initialize map
         const map = L.map('map', {
@@ -363,6 +394,12 @@
                         '<button onclick="location.reload()">Reload</button>' +
                         '</div>';
                 });
+        });
+
+        // Add event listener to FAB for resetting the map
+        document.getElementById('fab-reset').addEventListener('click', () => {
+            window.resetHighlighting();
+            showNotification('Map reset successfully', 'success');
         });
     </script>
     <script src="scripts/map.js"></script>

@@ -30,4 +30,30 @@ function clearLayers() {
     }
 }
 
-export { resetHighlighting, mergeGeometries, clearLayers };
+// Function to update the map with search results
+function updateMapForSearchResults(features) {
+    clearLayers();
+    
+    const searchLayer = L.geoJSON(features, {
+        style: {
+            color: '#e74c3c',
+            weight: 3,
+            opacity: 1,
+            fillOpacity: 0.4,
+            fillColor: '#f39c12'
+        },
+        onEachFeature: (feature, layer) => {
+            layer.bindTooltip(`<div class="custom-tooltip"><b>${feature.properties.wardname}</b></div>`, {
+                sticky: true,
+                direction: 'top',
+                offset: [0, -5],
+                opacity: 1,
+                className: 'custom-tooltip'
+            });
+        }
+    }).addTo(window.map);
+    
+    window.map.fitBounds(searchLayer.getBounds());
+}
+
+export { resetHighlighting, mergeGeometries, clearLayers, updateMapForSearchResults };

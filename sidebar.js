@@ -382,60 +382,26 @@ function handleSearchInput(event) {
     // Search and highlight matching features
     window.clearLayers();
     
-    // Create layers with different styling for matched features
-    window.stateLayer = L.geoJSON(null, {
-        style: feature => {
-            const stateName = feature.properties.statename.toLowerCase();
-            const isMatch = stateName.includes(searchTerm);
-            return {
-                color: isMatch ? '#e74c3c' : '#3498db',
-                weight: isMatch ? 3 : 2,
-                opacity: 1,
-                fillOpacity: isMatch ? 0.4 : 0.2,
-                fillColor: isMatch ? '#f39c12' : '#3498db'
-            };
-        },
-        onEachFeature: (feature, layer) => {
-            layer.bindTooltip(`<div class="custom-tooltip"><b>${feature.properties.statename}</b></div>`, {
-                sticky: true,
-                direction: 'top',
-                offset: [0, -5],
-                opacity: 1,
-                className: 'custom-tooltip'
-            });
-            
-            // Add click event
-            layer.on('click', function() {
-                // Find and select the corresponding state in the dropdown
-                const stateSelect = document.getElementById('state-select');
-                stateSelect.value = feature.properties.statename;
-                
-                // Trigger the change event
-                const event = new Event('change');
-                stateSelect.dispatchEvent(event);
-            });
-        }
-    }).addTo(window.map);
-    
     // Use filterStates from filters.js to filter states that match the search term
     const states = filterStates(window.wardGeoJSON.features, { name: searchTerm });
-    states.forEach(state => {
-        const stateFeatures = filterWards(window.wardGeoJSON.features, { statename: state.name });
-        if (stateFeatures.length > 0) {
-            const stateGeojson = {
-                type: 'Feature',
-                properties: { statename: state.name, statecode: state.code },
-                geometry: window.mergeGeometries(stateFeatures)
-            };
-            window.stateLayer.addData(stateGeojson);
-        }
-    });
+    const lgas = filterLGAs(window.wardGeoJSON.features, { name: searchTerm });
+    const wards = filterWards(window.wardGeoJSON.features, { wardname: searchTerm });
     
-    // If we found results, show notification
-    if (states.length > 0) {
-        showNotification(`Found ${states.length} matching states`, 'success');
+    const searchResults = [...states, ...lgas, ...wards];
+    
+    if (searchResults.length > 0) {
+        const features = searchResults.map(result => {
+            return window.wardGeoJSON.features.find(feature => {
+                return feature.properties.wardname === result.wardname ||
+                       feature.properties.lganame === result.name ||
+                       feature.properties.statename === result.name;
+            });
+        }).filter(feature => feature);
+        
+        window.updateMapForSearchResults(features);
+        showNotification(`Found ${features.length} matching results`, 'success');
     } else if (searchTerm.length > 2) {
-        showNotification('No matching states found', 'warning');
+        showNotification('No matching results found', 'warning');
     }
 }
 
