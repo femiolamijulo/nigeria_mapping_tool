@@ -11,23 +11,44 @@ function initializeSidebar() {
     sidebar.innerHTML = `
         <div class="sidebar-header">Map Filters</div>
         <div class="dropdown-container">
-            <select id="state-select">
-                <option value="">-- Select State --</option>
-            </select>
-            <select id="lga-select" disabled>
-                <option value="">-- Select LGA --</option>
-            </select>
-            <select id="ward-select" disabled>
-                <option value="">-- Select Ward --</option>
-            </select>
+            <div style="position: relative;">
+                <select id="state-select">
+                    <option value="">-- Select State --</option>
+                </select>
+                <div style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #3498db;">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+            </div>
+            
+            <div style="position: relative;">
+                <select id="lga-select" disabled>
+                    <option value="">-- Select LGA --</option>
+                </select>
+                <div style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #3498db;">
+                    <i class="fas fa-map"></i>
+                </div>
+            </div>
+            
+            <div style="position: relative;">
+                <select id="ward-select" disabled>
+                    <option value="">-- Select Ward --</option>
+                </select>
+                <div style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #3498db;">
+                    <i class="fas fa-thumbtack"></i>
+                </div>
+            </div>
+            
             <button id="reset-search">Reset Filters</button>
+        </div>
+        <div class="filter-info" style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 6px; font-size: 13px; color: #7f8c8d; border-left: 3px solid #3498db;">
+            <p style="margin: 0; padding: 0;"><i class="fas fa-info-circle" style="margin-right: 5px; color: #3498db;"></i> Select filters above or use the search box to explore Nigeria's regions.</p>
         </div>
     `;
     
     // Create toggle button
     const toggleButton = document.createElement('div');
     toggleButton.className = 'sidebar-toggle';
-    toggleButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
+    toggleButton.innerHTML = '<i class="fas fa-bars"></i>';
     
     document.body.appendChild(sidebar);
     document.body.appendChild(toggleButton);
@@ -35,38 +56,61 @@ function initializeSidebar() {
     // Toggle sidebar functionality
     toggleButton.addEventListener('click', () => {
         sidebar.classList.toggle('open');
+        toggleButton.classList.toggle('open');
         
         // Change icon based on sidebar state
         if (sidebar.classList.contains('open')) {
-            toggleButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
-            toggleButton.style.left = '310px';
+            toggleButton.innerHTML = '<i class="fas fa-times"></i>';
         } else {
-            toggleButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
-            toggleButton.style.left = '10px';
+            toggleButton.innerHTML = '<i class="fas fa-bars"></i>';
         }
+        
+        // Add transition effect
+        toggleButton.style.transition = 'left 0.3s ease';
     });
     
     // Show sidebar by default on larger screens
     if (window.innerWidth > 768) {
         sidebar.classList.add('open');
-        toggleButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
-        toggleButton.style.left = '310px';
-    }
-    
-    // Populate state dropdown when data is available
-    if (wardGeoJSON && wardGeoJSON.features) {
-        populateStateDropdown();
-        
-        // Add event listeners for dropdowns
-        document.getElementById('state-select').addEventListener('change', handleStateChange);
-        document.getElementById('lga-select').addEventListener('change', handleLGAChange);
+        toggleButton.classList.add('open');
+        toggleButton.innerHTML = '<i class="fas fa-times"></i>';
     }
     
     // Create search box on the map
     createMapSearchBox();
     
+    // Populate state dropdown when data is available
+    if (window.wardGeoJSON && window.wardGeoJSON.features) {
+        populateStateDropdown();
+        
+        // Add event listeners for dropdowns
+        addDropdownListeners();
+    } else {
+        // Listen for the dataLoaded event if data is not available yet
+        document.addEventListener('dataLoaded', () => {
+            populateStateDropdown();
+            addDropdownListeners();
+            
+            // Add subtle animation to show dropdowns are now active
+            const stateSelect = document.getElementById('state-select');
+            stateSelect.style.transition = 'all 0.3s ease';
+            stateSelect.style.borderColor = '#3498db';
+            setTimeout(() => {
+                stateSelect.style.borderColor = '#ddd';
+            }, 700);
+        });
+    }
+    
     // Add reset button functionality
     document.getElementById('reset-search').addEventListener('click', () => {
+        // Add button press animation
+        const resetButton = document.getElementById('reset-search');
+        resetButton.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            resetButton.style.transform = '';
+        }, 150);
+        
+        // Reset all filters
         document.getElementById('search-input').value = '';
         document.getElementById('state-select').value = '';
         document.getElementById('lga-select').value = '';
@@ -74,8 +118,18 @@ function initializeSidebar() {
         document.getElementById('lga-select').disabled = true;
         document.getElementById('ward-select').disabled = true;
         
-        resetHighlighting();
+        // Reset map
+        window.resetHighlighting();
+        
+        // Show success notification
+        showNotification('Map reset successfully', 'success');
     });
+}
+
+function addDropdownListeners() {
+    document.getElementById('state-select').addEventListener('change', handleStateChange);
+    document.getElementById('lga-select').addEventListener('change', handleLGAChange);
+    document.getElementById('ward-select').addEventListener('change', handleWardChange);
 }
 
 // Create search box as a map control
@@ -85,26 +139,118 @@ function createMapSearchBox() {
     searchControl.onAdd = function(map) {
         const searchBox = document.createElement('div');
         searchBox.className = 'map-search-box';
-        searchBox.innerHTML = `<input type="text" id="search-input" placeholder="Type to search...">`;
-        
-        // Style the search box
-        searchBox.style.backgroundColor = 'white';
-        searchBox.style.padding = '5px';
-        searchBox.style.borderRadius = '4px';
-        searchBox.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.2)';
-        
+        searchBox.innerHTML = `<input type="text" id="search-input" placeholder="Search for states, LGAs...">`;
         return searchBox;
     };
     
-    searchControl.addTo(map);
+    searchControl.addTo(window.map);
     
     // Add text search event listener
-    document.getElementById('search-input').addEventListener('input', handleSearchInput);
+    setTimeout(() => {
+        const searchInput = document.getElementById('search-input');
+        if (searchInput) {
+            searchInput.addEventListener('input', handleSearchInput);
+            
+            // Add clear button functionality
+            searchInput.addEventListener('keyup', function(e) {
+                if (e.key === 'Escape') {
+                    this.value = '';
+                    window.resetHighlighting();
+                }
+            });
+        }
+    }, 200);
+}
+
+// Show a notification message
+function showNotification(message, type = 'info') {
+    // Remove any existing notifications
+    const existingNotification = document.querySelector('.map-notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = 'map-notification';
+    
+    // Set icon and color based on type
+    let icon, color;
+    switch(type) {
+        case 'success':
+            icon = 'check-circle';
+            color = '#27ae60';
+            break;
+        case 'error':
+            icon = 'exclamation-triangle';
+            color = '#e74c3c';
+            break;
+        case 'warning':
+            icon = 'exclamation-circle';
+            color = '#f39c12';
+            break;
+        case 'info':
+        default:
+            icon = 'info-circle';
+            color = '#3498db';
+    }
+    
+    // Style the notification
+    Object.assign(notification.style, {
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        backgroundColor: 'white',
+        color: '#333',
+        padding: '12px 20px',
+        borderRadius: '8px',
+        boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
+        zIndex: '2000',
+        display: 'flex',
+        alignItems: 'center',
+        fontFamily: "'Poppins', sans-serif",
+        borderLeft: `4px solid ${color}`,
+        maxWidth: '300px',
+        animation: 'slideIn 0.3s ease-out forwards'
+    });
+    
+    notification.innerHTML = `
+        <i class="fas fa-${icon}" style="margin-right: 10px; color: ${color};"></i>
+        <span>${message}</span>
+    `;
+    
+    // Add animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Add to DOM
+    document.body.appendChild(notification);
+    
+    // Remove after a delay
+    setTimeout(() => {
+        notification.style.animation = 'fadeOut 0.3s forwards';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
 }
 
 function populateStateDropdown() {
     const stateSelect = document.getElementById('state-select');
-    const states = filterStates(wardGeoJSON.features);
+    const states = filterStates(window.wardGeoJSON.features);
+    
+    // Clear any existing options except the first one
+    while (stateSelect.options.length > 1) {
+        stateSelect.remove(1);
+    }
     
     // Sort states alphabetically
     states.sort((a, b) => a.name.localeCompare(b.name));
@@ -115,6 +261,9 @@ function populateStateDropdown() {
         option.textContent = state.name;
         stateSelect.appendChild(option);
     });
+    
+    // Add animation feedback to show dropdown is populated
+    stateSelect.classList.add('populated');
 }
 
 function handleStateChange(e) {
@@ -129,13 +278,14 @@ function handleStateChange(e) {
     
     if (!stateName) {
         lgaSelect.disabled = true;
+        window.resetHighlighting();
         return;
     }
     
     // Enable LGA select and populate
     lgaSelect.disabled = false;
     
-    const lgas = getLGAsByState(wardGeoJSON.features, stateName);
+    const lgas = getLGAsByState(window.wardGeoJSON.features, stateName);
     
     // Sort LGAs alphabetically
     lgas.sort((a, b) => a.name.localeCompare(b.name));
@@ -149,6 +299,9 @@ function handleStateChange(e) {
     
     // Update map to highlight the selected state
     updateMapForState(stateName);
+    
+    // Show notification
+    showNotification(`Selected state: ${stateName}`, 'info');
 }
 
 function handleLGAChange(e) {
@@ -161,13 +314,14 @@ function handleLGAChange(e) {
     
     if (!lgaName) {
         wardSelect.disabled = true;
+        window.resetHighlighting();
         return;
     }
     
     // Enable ward select and populate
     wardSelect.disabled = false;
     
-    const wards = getWardsByLGA(wardGeoJSON.features, lgaName, stateName);
+    const wards = getWardsByLGA(window.wardGeoJSON.features, lgaName, stateName);
     
     // Sort wards alphabetically
     wards.sort((a, b) => a.properties.wardname.localeCompare(b.properties.wardname));
@@ -199,7 +353,7 @@ function updateMapForState(stateName) {
         }
     }).addTo(map);
     
-    const stateFeatures = filterWards(wardGeoJSON.features, { statename: stateName });
+    const stateFeatures = filterWards(window.wardGeoJSON.features, { statename: stateName });
     if (stateFeatures.length > 0) {
         const stateGeojson = {
             type: 'Feature',
@@ -221,44 +375,77 @@ function handleSearchInput(event) {
     
     if (!searchTerm || searchTerm.length < 3) {
         // Reset highlighting if search is cleared or too short
-        resetHighlighting();
+        window.resetHighlighting();
         return;
     }
     
     // Search and highlight matching features
-    clearLayers();
+    window.clearLayers();
     
     // Create layers with different styling for matched features
-    stateLayer = L.geoJSON(null, {
+    window.stateLayer = L.geoJSON(null, {
         style: feature => {
             const stateName = feature.properties.statename.toLowerCase();
             const isMatch = stateName.includes(searchTerm);
             return {
-                color: isMatch ? '#ff4500' : '#3388ff',
+                color: isMatch ? '#e74c3c' : '#3498db',
                 weight: isMatch ? 3 : 2,
                 opacity: 1,
                 fillOpacity: isMatch ? 0.4 : 0.2,
-                fillColor: isMatch ? '#ff7f50' : '#add8e6'
+                fillColor: isMatch ? '#f39c12' : '#3498db'
             };
         },
         onEachFeature: (feature, layer) => {
-            layer.bindPopup(`<b>${feature.properties.statename}</b>`);
+            layer.bindTooltip(`<div class="custom-tooltip"><b>${feature.properties.statename}</b></div>`, {
+                sticky: true,
+                direction: 'top',
+                offset: [0, -5],
+                opacity: 1,
+                className: 'custom-tooltip'
+            });
+            
+            // Add click event
+            layer.on('click', function() {
+                // Find and select the corresponding state in the dropdown
+                const stateSelect = document.getElementById('state-select');
+                stateSelect.value = feature.properties.statename;
+                
+                // Trigger the change event
+                const event = new Event('change');
+                stateSelect.dispatchEvent(event);
+            });
         }
-    }).addTo(map);
+    }).addTo(window.map);
     
     // Use filterStates from filters.js to filter states that match the search term
-    const states = filterStates(wardGeoJSON.features, { name: searchTerm });
+    const states = filterStates(window.wardGeoJSON.features, { name: searchTerm });
     states.forEach(state => {
-        const stateFeatures = filterWards(wardGeoJSON.features, { statename: state.name });
+        const stateFeatures = filterWards(window.wardGeoJSON.features, { statename: state.name });
         if (stateFeatures.length > 0) {
             const stateGeojson = {
                 type: 'Feature',
                 properties: { statename: state.name, statecode: state.code },
-                geometry: mergeGeometries(stateFeatures)
+                geometry: window.mergeGeometries(stateFeatures)
             };
-            stateLayer.addData(stateGeojson);
+            window.stateLayer.addData(stateGeojson);
         }
     });
+    
+    // If we found results, show notification
+    if (states.length > 0) {
+        showNotification(`Found ${states.length} matching states`, 'success');
+    } else if (searchTerm.length > 2) {
+        showNotification('No matching states found', 'warning');
+    }
+}
+
+// Add a handler for ward selection
+function handleWardChange(e) {
+    const wardName = e.target.value;
+    if (wardName) {
+        showNotification(`Selected ward: ${wardName}`, 'info');
+        // Additional ward selection handling can be added here
+    }
 }
 
 export { initializeSidebar };
