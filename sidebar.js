@@ -10,19 +10,16 @@ function initializeSidebar() {
     sidebar.className = 'sidebar';
     sidebar.innerHTML = `
         <div class="sidebar-header">Map Filters</div>
-        <div class="search-box">
-            <input type="text" id="search-input" placeholder="Type to search...">
-            <div class="dropdown-container">
-                <select id="state-select">
-                    <option value="">-- Select State --</option>
-                </select>
-                <select id="lga-select" disabled>
-                    <option value="">-- Select LGA --</option>
-                </select>
-                <select id="ward-select" disabled>
-                    <option value="">-- Select Ward --</option>
-                </select>
-            </div>
+        <div class="dropdown-container">
+            <select id="state-select">
+                <option value="">-- Select State --</option>
+            </select>
+            <select id="lga-select" disabled>
+                <option value="">-- Select LGA --</option>
+            </select>
+            <select id="ward-select" disabled>
+                <option value="">-- Select Ward --</option>
+            </select>
             <button id="reset-search">Reset Filters</button>
         </div>
     `;
@@ -65,8 +62,8 @@ function initializeSidebar() {
         document.getElementById('lga-select').addEventListener('change', handleLGAChange);
     }
     
-    // Add text search event listener
-    document.getElementById('search-input').addEventListener('input', handleSearchInput);
+    // Create search box on the map
+    createMapSearchBox();
     
     // Add reset button functionality
     document.getElementById('reset-search').addEventListener('click', () => {
@@ -79,6 +76,30 @@ function initializeSidebar() {
         
         resetHighlighting();
     });
+}
+
+// Create search box as a map control
+function createMapSearchBox() {
+    const searchControl = L.control({position: 'topright'});
+    
+    searchControl.onAdd = function(map) {
+        const searchBox = document.createElement('div');
+        searchBox.className = 'map-search-box';
+        searchBox.innerHTML = `<input type="text" id="search-input" placeholder="Type to search...">`;
+        
+        // Style the search box
+        searchBox.style.backgroundColor = 'white';
+        searchBox.style.padding = '5px';
+        searchBox.style.borderRadius = '4px';
+        searchBox.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.2)';
+        
+        return searchBox;
+    };
+    
+    searchControl.addTo(map);
+    
+    // Add text search event listener
+    document.getElementById('search-input').addEventListener('input', handleSearchInput);
 }
 
 function populateStateDropdown() {
