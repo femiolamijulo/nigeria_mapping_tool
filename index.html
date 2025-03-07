@@ -3,10 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nigeria Map Tool</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Interactive Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+        #map {
+            width: 100%;
+            height: 100vh;
+            position: absolute;
+            z-index: 1;
+        }
+        .info {
+            padding: 6px 8px;
+            font: 14px/16px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255,255,255,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        .info h4 {
+            margin: 0 0 5px;
+            color: #777;
+        }
+        
+        /* Sidebar styles */
+        .sidebar {
+            height: 100%;
+            width: 300px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+            overflow-y: auto;
+            padding: 15px;
+            transform: translateX(-300px);
+        }
+        
+        .sidebar.open {
+            transform: translateX(0);
+        }
+        
+        .sidebar-toggle {
+            position: absolute;
+            top: 10px;
+            left: 310px;
+            z-index: 1001;
+            background: white;
+            border-radius: 0 4px 4px 0;
+            padding: 10px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+        
+        .sidebar-toggle.open {
+            left: 310px;
+        }
+        
+        .search-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .dropdown-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        #search-input, select, button {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        
+        #reset-search {
+            background: #f44336;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        
+        .sidebar-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+    </style>
 </head>
 <body>
-    <!-- ...existing code... -->
+    <div id="map"></div>
+    
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script type="module">
+        import { initializeSidebar } from './sidebar.js';
+        import { resetHighlighting, mergeGeometries, clearLayers } from './scripts.js';
+        
+        // Make these functions available globally
+        window.resetHighlighting = resetHighlighting;
+        window.mergeGeometries = mergeGeometries;
+        window.clearLayers = clearLayers;
+        
+        // Initialize map
+        const map = L.map('map').setView([9.0820, 8.6753], 6);
+        window.map = map;  // Make map available globally
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Global variables
+        window.wardGeoJSON;
+        window.stateLayer;
+        
+        // Initialize the UI when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSidebar();
+            
+            // Load your GeoJSON data here
+            fetch('path/to/nigeria_wards.geojson')
+                .then(response => response.json())
+                .then(data => {
+                    window.wardGeoJSON = data;
+                    // Now trigger state dropdown population since data is available
+                    document.dispatchEvent(new CustomEvent('dataLoaded'));
+                });
+        });
+    </script>
 </body>
 </html>
