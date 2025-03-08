@@ -3,6 +3,7 @@
  * Handles the collapsible sidebar and search filters
  */
 import { filterStates, filterLGAs, filterWards, getLGAsByState, getWardsByLGA } from './scripts/filters.js';
+import { zoomToFeature } from './scripts.js';
 
 function initializeSidebar() {
     // Create sidebar container
@@ -300,6 +301,12 @@ function handleStateChange(e) {
     // Update map to highlight the selected state
     updateMapForState(stateName);
     
+    // Zoom and center the map on the selected state
+    const stateFeature = window.wardGeoJSON.features.find(feature => feature.properties.statename === stateName);
+    if (stateFeature) {
+        zoomToFeature(stateFeature);
+    }
+    
     // Show notification
     showNotification(`Selected state: ${stateName}`, 'info');
 }
@@ -335,6 +342,12 @@ function handleLGAChange(e) {
     
     // Update map to highlight the selected LGA
     updateMapForLGA(lgaName, stateName);
+    
+    // Zoom and center the map on the selected LGA
+    const lgaFeature = window.wardGeoJSON.features.find(feature => feature.properties.lganame === lgaName && feature.properties.statename === stateName);
+    if (lgaFeature) {
+        zoomToFeature(lgaFeature);
+    }
 }
 
 function updateMapForState(stateName) {
@@ -408,10 +421,16 @@ function handleSearchInput(event) {
 // Add a handler for ward selection
 function handleWardChange(e) {
     const wardName = e.target.value;
+    const lgaName = document.getElementById('lga-select').value;
+    const stateName = document.getElementById('state-select').value;
+    
     if (wardName) {
         showNotification(`Selected ward: ${wardName}`, 'info');
-        // Additional ward selection handling can be added here
+        
+        // Zoom and center the map on the selected ward
+        const wardFeature = window.wardGeoJSON.features.find(feature => feature.properties.wardname === wardName && feature.properties.lganame === lgaName && feature.properties.statename === stateName);
+        if (wardFeature) {
+            zoomToFeature(wardFeature);
+        }
     }
 }
-
-export { initializeSidebar };

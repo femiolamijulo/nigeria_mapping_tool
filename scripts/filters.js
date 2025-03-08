@@ -159,17 +159,3 @@ function filterByLGA(lgaCode) {
 function filterByWard(wardCode) {
     // ...existing code...
 }
-
-// Export all functions
-export {
-    filterStates,
-    filterLGAs,
-    filterWards,
-    getLGAsByState,
-    getWardsByLGA,
-    extractStates,
-    extractLGAs,
-    filterByState,
-    filterByLGA,
-    filterByWard
-};

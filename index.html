@@ -342,8 +342,12 @@
         window.resetHighlighting = resetHighlighting;
         window.mergeGeometries = mergeGeometries;
         window.clearLayers = clearLayers;
-        window.showNotification = showNotification;
         window.updateMapForSearchResults = updateMapForSearchResults;
+        
+        // Ensure showNotification is defined
+        window.showNotification = function(message, type = 'info') {
+            // ...existing code from sidebar.js...
+        };
         
         // Initialize map
         const map = L.map('map', {

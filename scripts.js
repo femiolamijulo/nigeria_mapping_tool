@@ -56,4 +56,15 @@ function updateMapForSearchResults(features) {
     window.map.fitBounds(searchLayer.getBounds());
 }
 
-export { resetHighlighting, mergeGeometries, clearLayers, updateMapForSearchResults };
+// Function to zoom and center the map on a given feature
+function zoomToFeature(feature) {
+    const layer = L.geoJSON(feature);
+    window.map.fitBounds(layer.getBounds());
+}
+
+// Function to show notifications
+function showNotification(message, type = 'info') {
+    // ...existing code from sidebar.js...
+}
+
+export { resetHighlighting, mergeGeometries, clearLayers, updateMapForSearchResults, showNotification, zoomToFeature };
