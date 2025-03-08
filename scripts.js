@@ -1,11 +1,13 @@
 import MapManager from './MapManager.js';
-import { showNotification } from './sidebar.js';
+import { showNotification } from './utils.js';
 
 // This file should only contain functions that aren't in other modules
 
 // Keep the resetHighlighting function
 function resetHighlighting() {
-    const map = MapManager.getInstance().getMap();
+    const mapManager = MapManager.getInstance();
+    const stateLayer = mapManager.getStateLayer();
+    
     if (stateLayer) {
         stateLayer.setStyle({
             color: '#3388ff',
@@ -28,7 +30,9 @@ function mergeGeometries(features) {
 
 // Utility to clear map layers
 function clearLayers() {
-    const map = MapManager.getInstance().getMap();
+    const mapManager = MapManager.getInstance();
+    const stateLayer = mapManager.getStateLayer();
+    
     if (stateLayer) {
         stateLayer.clearLayers();
     }
@@ -68,9 +72,4 @@ function zoomToFeature(feature) {
     map.fitBounds(layer.getBounds());
 }
 
-// Function to show notifications
-function showNotification(message, type = 'info') {
-    // ...existing code from sidebar.js...
-}
-
-export { resetHighlighting, mergeGeometries, clearLayers, updateMapForSearchResults, showNotification, zoomToFeature };
+export { resetHighlighting, mergeGeometries, clearLayers, updateMapForSearchResults, zoomToFeature };

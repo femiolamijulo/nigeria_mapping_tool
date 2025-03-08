@@ -4,6 +4,7 @@
  */
 import { filterStates, filterLGAs, filterWards, getLGAsByState, getWardsByLGA } from './scripts/filters.js';
 import { zoomToFeature, clearLayers, mergeGeometries, updateMapForSearchResults } from './scripts.js';
+import { showNotification } from './utils.js';
 import MapManager from './MapManager.js';
 
 const mapManager = MapManager.getInstance();
@@ -46,7 +47,6 @@ function initializeSidebar() {
             <button id="reset-search">Reset Filters</button>
         </div>
         <div class="filter-info" style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 6px; font-size: 13px; color: #7f8c8d; border-left: 3px solid #3498db;">
-            <p style="margin: 0; padding: 0;"><i class="fas fa-info-circle" style="margin-right: 5px; color: #3498db;"></i> Select filters above or use the search box to explore Nigeria's regions.</p>
         </div>
     `;
     

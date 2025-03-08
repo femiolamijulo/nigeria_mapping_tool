@@ -18,6 +18,9 @@ class MapManager {
             maxZoom: 20
         }).addTo(this.map);
 
+        this.wardGeoJSON = null;
+        this.stateLayer = null;
+
         MapManager.instance = this;
     }
 
@@ -30,6 +33,22 @@ class MapManager {
 
     getMap() {
         return this.map;
+    }
+
+    setWardGeoJSON(data) {
+        this.wardGeoJSON = data;
+    }
+
+    getWardGeoJSON() {
+        return this.wardGeoJSON;
+    }
+    
+    setStateLayer(layer) {
+        this.stateLayer = layer;
+    }
+    
+    getStateLayer() {
+        return this.stateLayer;
     }
 }
 

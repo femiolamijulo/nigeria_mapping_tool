@@ -1,5 +1,6 @@
 import { initializeSidebar } from './sidebar.js';
 import { resetHighlighting, mergeGeometries, clearLayers, updateMapForSearchResults } from './scripts.js';
+import { showNotification } from './utils.js';
 import MapManager from './MapManager.js';
 
 /**
