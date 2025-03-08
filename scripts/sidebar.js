@@ -2,7 +2,7 @@
  * Sidebar component for Nigeria Map Tool
  * Handles the collapsible sidebar and search filters
  */
-import { filterStates, filterLGAs, filterWards, getLGAsByState, getWardsByLGA } from './scripts/filters.js';
+import { filterStates, filterLGAs, filterWards, getLGAsByState, getWardsByLGA } from './filters.js';
 import { zoomToFeature, clearLayers, mergeGeometries, updateMapForSearchResults } from './scripts.js';
 import { showNotification } from './utils.js';
 import MapManager from './MapManager.js';

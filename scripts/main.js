@@ -4,7 +4,7 @@ import { showNotification } from './utils.js';  // ✅ Import notification utili
 import MapManager from './MapManager.js';  
 
 // Initialize the MapManager Singleton
-const mapManager = new MapManager();
+const mapManager = new MapManager.getInstance();
 const map = mapManager.getMap();
 
 // Attach functions globally (if necessary)
