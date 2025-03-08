@@ -9,6 +9,7 @@ function resetHighlighting() {
     const map = mapManager.getMap();
     const stateLayer = mapManager.getStateLayer();
     
+    
     if (stateLayer) {
         stateLayer.setStyle({
             color: '#3388ff',
