@@ -3,7 +3,7 @@
  * Handles the collapsible sidebar and search filters
  */
 import { filterStates, filterLGAs, filterWards, getLGAsByState, getWardsByLGA } from './scripts/filters.js';
-import { zoomToFeature } from './scripts.js';
+import { zoomToFeature, clearLayers, mergeGeometries, updateMapForSearchResults } from './scripts.js';
 
 function initializeSidebar() {
     // Create sidebar container
