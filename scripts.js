@@ -1,14 +1,17 @@
+import MapManager from './MapManager.js';
+import { showNotification } from './sidebar.js';
+
 // This file should only contain functions that aren't in other modules
 
 // Keep the resetHighlighting function
 function resetHighlighting() {
+    const map = MapManager.getInstance().getMap();
     if (stateLayer) {
         stateLayer.setStyle({
             color: '#3388ff',
             weight: 2,
             opacity: 1,
             fillOpacity: 0.2,
-            fillColor: '#add8e6'
         });
     }
 }
@@ -25,6 +28,7 @@ function mergeGeometries(features) {
 
 // Utility to clear map layers
 function clearLayers() {
+    const map = MapManager.getInstance().getMap();
     if (stateLayer) {
         stateLayer.clearLayers();
     }
@@ -32,6 +36,7 @@ function clearLayers() {
 
 // Function to update the map with search results
 function updateMapForSearchResults(features) {
+    const map = MapManager.getInstance().getMap();
     clearLayers();
     
     const searchLayer = L.geoJSON(features, {
@@ -51,15 +56,16 @@ function updateMapForSearchResults(features) {
                 className: 'custom-tooltip'
             });
         }
-    }).addTo(window.map);
+    }).addTo(map);
     
-    window.map.fitBounds(searchLayer.getBounds());
+    map.fitBounds(searchLayer.getBounds());
 }
 
 // Function to zoom and center the map on a given feature
 function zoomToFeature(feature) {
+    const map = MapManager.getInstance().getMap();
     const layer = L.geoJSON(feature);
-    window.map.fitBounds(layer.getBounds());
+    map.fitBounds(layer.getBounds());
 }
 
 // Function to show notifications

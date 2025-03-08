@@ -148,14 +148,4 @@ function getWardsByLGA(wardFeatures, lgaName, stateName) {
     });
 }
 
-function filterByState(stateCode) {
-    // ...existing code...
-}
-
-function filterByLGA(lgaCode) {
-    // ...existing code...
-}
-
-function filterByWard(wardCode) {
-    // ...existing code...
-}
+export { filterStates, filterLGAs, filterWards, getLGAsByState, getWardsByLGA };

@@ -4,6 +4,10 @@
  */
 import { filterStates, filterLGAs, filterWards, getLGAsByState, getWardsByLGA } from './scripts/filters.js';
 import { zoomToFeature, clearLayers, mergeGeometries, updateMapForSearchResults } from './scripts.js';
+import MapManager from './MapManager.js';
+
+const mapManager = MapManager.getInstance();
+const map = mapManager.getMap();
 
 function initializeSidebar() {
     // Create sidebar container
@@ -144,7 +148,7 @@ function createMapSearchBox() {
         return searchBox;
     };
     
-    searchControl.addTo(window.map);
+    searchControl.addTo(map);
     
     // Add text search event listener
     setTimeout(() => {
@@ -279,7 +283,7 @@ function handleStateChange(e) {
     
     if (!stateName) {
         lgaSelect.disabled = true;
-        window.resetHighlighting();
+        resetHighlighting();
         return;
     }
     
