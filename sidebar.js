@@ -85,7 +85,7 @@ function initializeSidebar() {
     createMapSearchBox();
     
     // Populate state dropdown when data is available
-    if (window.wardGeoJSON && window.wardGeoJSON.features) {
+    if (mapManager.getWardGeoJSON() && mapManager.getWardGeoJSON().features) {
         populateStateDropdown();
         
         // Add event listeners for dropdowns
@@ -250,7 +250,7 @@ function showNotification(message, type = 'info') {
 
 function populateStateDropdown() {
     const stateSelect = document.getElementById('state-select');
-    const states = filterStates(window.wardGeoJSON.features);
+    const states = filterStates(mapManager.getWardGeoJSON().features);
     
     // Clear any existing options except the first one
     while (stateSelect.options.length > 1) {
@@ -290,7 +290,7 @@ function handleStateChange(e) {
     // Enable LGA select and populate
     lgaSelect.disabled = false;
     
-    const lgas = getLGAsByState(window.wardGeoJSON.features, stateName);
+    const lgas = getLGAsByState(mapManager.getWardGeoJSON().features, stateName);
     
     // Sort LGAs alphabetically
     lgas.sort((a, b) => a.name.localeCompare(b.name));
@@ -306,7 +306,7 @@ function handleStateChange(e) {
     updateMapForState(stateName);
     
     // Zoom and center the map on the selected state
-    const stateFeature = window.wardGeoJSON.features.find(feature => feature.properties.statename === stateName);
+    const stateFeature = mapManager.getWardGeoJSON().features.find(feature => feature.properties.statename === stateName);
     if (stateFeature) {
         zoomToFeature(stateFeature);
     }
@@ -325,14 +325,14 @@ function handleLGAChange(e) {
     
     if (!lgaName) {
         wardSelect.disabled = true;
-        window.resetHighlighting();
+        resetHighlighting();
         return;
     }
     
     // Enable ward select and populate
     wardSelect.disabled = false;
     
-    const wards = getWardsByLGA(window.wardGeoJSON.features, lgaName, stateName);
+    const wards = getWardsByLGA(mapManager.getWardGeoJSON().features, lgaName, stateName);
     
     // Sort wards alphabetically
     wards.sort((a, b) => a.properties.wardname.localeCompare(b.properties.wardname));
@@ -348,7 +348,7 @@ function handleLGAChange(e) {
     updateMapForLGA(lgaName, stateName);
     
     // Zoom and center the map on the selected LGA
-    const lgaFeature = window.wardGeoJSON.features.find(feature => feature.properties.lganame === lgaName && feature.properties.statename === stateName);
+    const lgaFeature = mapManager.getWardGeoJSON().features.find(feature => feature.properties.lganame === lgaName && feature.properties.statename === stateName);
     if (lgaFeature) {
         zoomToFeature(lgaFeature);
     }
@@ -370,7 +370,7 @@ function updateMapForState(stateName) {
         }
     }).addTo(map);
     
-    const stateFeatures = filterWards(window.wardGeoJSON.features, { statename: stateName });
+    const stateFeatures = filterWards(mapManager.getWardGeoJSON().features, { statename: stateName });
     if (stateFeatures.length > 0) {
         const stateGeojson = {
             type: 'Feature',
@@ -400,15 +400,15 @@ function handleSearchInput(event) {
     window.clearLayers();
     
     // Use filterStates from filters.js to filter states that match the search term
-    const states = filterStates(window.wardGeoJSON.features, { name: searchTerm });
-    const lgas = filterLGAs(window.wardGeoJSON.features, { name: searchTerm });
-    const wards = filterWards(window.wardGeoJSON.features, { wardname: searchTerm });
+    const states = filterStates(mapManager.getWardGeoJSON().features, { name: searchTerm });
+    const lgas = filterLGAs(mapManager.getWardGeoJSON().features, { name: searchTerm });
+    const wards = filterWards(mapManager.getWardGeoJSON().features, { wardname: searchTerm });
     
     const searchResults = [...states, ...lgas, ...wards];
     
     if (searchResults.length > 0) {
         const features = searchResults.map(result => {
-            return window.wardGeoJSON.features.find(feature => {
+            return mapManager.getWardGeoJSON().features.find(feature => {
                 return feature.properties.wardname === result.wardname ||
                        feature.properties.lganame === result.name ||
                        feature.properties.statename === result.name;
@@ -432,7 +432,7 @@ function handleWardChange(e) {
         showNotification(`Selected ward: ${wardName}`, 'info');
         
         // Zoom and center the map on the selected ward
-        const wardFeature = window.wardGeoJSON.features.find(feature => feature.properties.wardname === wardName && feature.properties.lganame === lgaName && feature.properties.statename === stateName);
+        const wardFeature = mapManager.getWardGeoJSON().features.find(feature => feature.properties.wardname === wardName && feature.properties.lganame === lgaName && feature.properties.statename === stateName);
         if (wardFeature) {
             zoomToFeature(wardFeature);
         }

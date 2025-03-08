@@ -6,6 +6,7 @@ import { showNotification } from './utils.js';
 // Keep the resetHighlighting function
 function resetHighlighting() {
     const mapManager = MapManager.getInstance();
+    const map = mapManager.getMap();
     const stateLayer = mapManager.getStateLayer();
     
     if (stateLayer) {
@@ -14,6 +15,7 @@ function resetHighlighting() {
             weight: 2,
             opacity: 1,
             fillOpacity: 0.2,
+            fillColor: '#add8e6'
         });
     }
 }
@@ -31,6 +33,7 @@ function mergeGeometries(features) {
 // Utility to clear map layers
 function clearLayers() {
     const mapManager = MapManager.getInstance();
+    const map = mapManager.getMap();
     const stateLayer = mapManager.getStateLayer();
     
     if (stateLayer) {
@@ -40,7 +43,8 @@ function clearLayers() {
 
 // Function to update the map with search results
 function updateMapForSearchResults(features) {
-    const map = MapManager.getInstance().getMap();
+    const mapManager = MapManager.getInstance();
+    const map = mapManager.getMap();
     clearLayers();
     
     const searchLayer = L.geoJSON(features, {
@@ -67,7 +71,8 @@ function updateMapForSearchResults(features) {
 
 // Function to zoom and center the map on a given feature
 function zoomToFeature(feature) {
-    const map = MapManager.getInstance().getMap();
+    const mapManager = MapManager.getInstance();
+    const map = mapManager.getMap();
     const layer = L.geoJSON(feature);
     map.fitBounds(layer.getBounds());
 }
